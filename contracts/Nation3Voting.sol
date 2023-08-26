@@ -2,15 +2,15 @@
 
 pragma solidity 0.8.17;
 
-import {IVotesUpgradeable} from "@openzeppelin/contracts-upgradeable/governance/utils/IVotesUpgradeable.sol";
-import {SafeCastUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/math/SafeCastUpgradeable.sol";
-import {IERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import { IVotesUpgradeable } from "@openzeppelin/contracts-upgradeable/governance/utils/IVotesUpgradeable.sol";
+import { SafeCastUpgradeable } from "@openzeppelin/contracts-upgradeable/utils/math/SafeCastUpgradeable.sol";
+import { IERC20Upgradeable } from "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 
-import {IMembership} from "@aragon/osx/core/plugin/membership/IMembership.sol";
-import {IDAO} from "@aragon/osx/core/dao/IDAO.sol";
-import {RATIO_BASE, _applyRatioCeiled} from "./utils/Ratio.sol";
-import {MajorityVotingBase} from "@aragon/osx/plugins/governance/majority-voting/MajorityVotingBase.sol";
-import {IMajorityVoting} from "@aragon/osx/plugins/governance/majority-voting/IMajorityVoting.sol";
+import { IMembership } from "@aragon/osx/core/plugin/membership/IMembership.sol";
+import { IDAO } from "@aragon/osx/core/dao/IDAO.sol";
+import { RATIO_BASE, _applyRatioCeiled } from "./utils/Ratio.sol";
+import { MajorityVotingBase } from "@aragon/osx/plugins/governance/majority-voting/MajorityVotingBase.sol";
+import { IMajorityVoting } from "@aragon/osx/plugins/governance/majority-voting/IMajorityVoting.sol";
 
 /// @title Nation3Voting
 /// @author Nation3 DAO
@@ -20,8 +20,7 @@ contract Nation3Voting is IMembership, MajorityVotingBase {
     using SafeCastUpgradeable for uint256;
 
     /// @notice The [ERC-165](https://eips.ethereum.org/EIPS/eip-165) interface ID of the contract.
-    bytes4 internal constant TOKEN_VOTING_INTERFACE_ID =
-        this.initialize.selector ^ this.getVotingToken.selector;
+    bytes4 internal constant TOKEN_VOTING_INTERFACE_ID = this.initialize.selector ^ this.getVotingToken.selector;
 
     /// @notice An [OpenZeppelin `Votes`](https://docs.openzeppelin.com/contracts/4.x/api/governance#Votes) compatible contract referencing the token being used for voting.
     IVotesUpgradeable private votingToken;
@@ -34,26 +33,19 @@ contract Nation3Voting is IMembership, MajorityVotingBase {
     /// @param _dao The IDAO interface of the associated DAO.
     /// @param _votingSettings The voting settings.
     /// @param _token The [ERC-20](https://eips.ethereum.org/EIPS/eip-20) token used for voting.
-    function initialize(
-        IDAO _dao,
-        VotingSettings calldata _votingSettings,
-        IVotesUpgradeable _token
-    ) external initializer {
+    function initialize(IDAO _dao, VotingSettings calldata _votingSettings, IVotesUpgradeable _token) external initializer {
         __MajorityVotingBase_init(_dao, _votingSettings);
 
         votingToken = _token;
 
-        emit MembershipContractAnnounced({definingContract: address(_token)});
+        emit MembershipContractAnnounced({ definingContract: address(_token) });
     }
 
     /// @notice Checks if this or the parent contract supports an interface by its ID.
     /// @param _interfaceId The ID of the interface.
     /// @return Returns `true` if the interface is supported.
     function supportsInterface(bytes4 _interfaceId) public view virtual override returns (bool) {
-        return
-            _interfaceId == TOKEN_VOTING_INTERFACE_ID ||
-            _interfaceId == type(IMembership).interfaceId ||
-            super.supportsInterface(_interfaceId);
+        return _interfaceId == TOKEN_VOTING_INTERFACE_ID || _interfaceId == type(IMembership).interfaceId || super.supportsInterface(_interfaceId);
     }
 
     /// @notice getter function for the voting token.
@@ -84,11 +76,7 @@ contract Nation3Voting is IMembership, MajorityVotingBase {
 
             if (minProposerVotingPower_ != 0) {
                 // Because of the checks in `TokenVotingSetup`, we can assume that `votingToken` is an [ERC-20](https://eips.ethereum.org/EIPS/eip-20) token.
-                if (
-                    votingToken.getVotes(_msgSender()) < minProposerVotingPower_ &&
-                    IERC20Upgradeable(address(votingToken)).balanceOf(_msgSender()) <
-                    minProposerVotingPower_
-                ) {
+                if (votingToken.getVotes(_msgSender()) < minProposerVotingPower_ && IERC20Upgradeable(address(votingToken)).balanceOf(_msgSender()) < minProposerVotingPower_) {
                     revert ProposalCreationForbidden(_msgSender());
                 }
             }
@@ -107,14 +95,7 @@ contract Nation3Voting is IMembership, MajorityVotingBase {
 
         (_startDate, _endDate) = _validateProposalDates(_startDate, _endDate);
 
-        proposalId = _createProposal({
-            _creator: _msgSender(),
-            _metadata: _metadata,
-            _startDate: _startDate,
-            _endDate: _endDate,
-            _actions: _actions,
-            _allowFailureMap: _allowFailureMap
-        });
+        proposalId = _createProposal({ _creator: _msgSender(), _metadata: _metadata, _startDate: _startDate, _endDate: _endDate, _actions: _actions, _allowFailureMap: _allowFailureMap });
 
         // Store proposal related information
         Proposal storage proposal_ = proposals[proposalId];
@@ -124,10 +105,7 @@ contract Nation3Voting is IMembership, MajorityVotingBase {
         proposal_.parameters.snapshotBlock = snapshotBlock.toUint64();
         proposal_.parameters.votingMode = votingMode();
         proposal_.parameters.supportThreshold = supportThreshold();
-        proposal_.parameters.minVotingPower = _applyRatioCeiled(
-            totalVotingPower_,
-            minParticipation()
-        );
+        proposal_.parameters.minVotingPower = _applyRatioCeiled(totalVotingPower_, minParticipation());
 
         // Reduce costs
         if (_allowFailureMap != 0) {
@@ -149,18 +127,11 @@ contract Nation3Voting is IMembership, MajorityVotingBase {
     /// @inheritdoc IMembership
     function isMember(address _account) external view returns (bool) {
         // A member must own at least one token or have at least one token delegated to her/him.
-        return
-            votingToken.getVotes(_account) > 0 ||
-            IERC20Upgradeable(address(votingToken)).balanceOf(_account) > 0;
+        return votingToken.getVotes(_account) > 0 || IERC20Upgradeable(address(votingToken)).balanceOf(_account) > 0;
     }
 
     /// @inheritdoc MajorityVotingBase
-    function _vote(
-        uint256 _proposalId,
-        VoteOption _voteOption,
-        address _voter,
-        bool _tryEarlyExecution
-    ) internal override {
+    function _vote(uint256 _proposalId, VoteOption _voteOption, address _voter, bool _tryEarlyExecution) internal override {
         Proposal storage proposal_ = proposals[_proposalId];
 
         // This could re-enter, though we can assume the governance token is not malicious
@@ -187,12 +158,7 @@ contract Nation3Voting is IMembership, MajorityVotingBase {
 
         proposal_.voters[_voter] = _voteOption;
 
-        emit VoteCast({
-            proposalId: _proposalId,
-            voter: _voter,
-            voteOption: _voteOption,
-            votingPower: votingPower
-        });
+        emit VoteCast({ proposalId: _proposalId, voter: _voter, voteOption: _voteOption, votingPower: votingPower });
 
         if (_tryEarlyExecution && _canExecute(_proposalId)) {
             _execute(_proposalId);
@@ -200,11 +166,7 @@ contract Nation3Voting is IMembership, MajorityVotingBase {
     }
 
     /// @inheritdoc MajorityVotingBase
-    function _canVote(
-        uint256 _proposalId,
-        address _account,
-        VoteOption _voteOption
-    ) internal view override returns (bool) {
+    function _canVote(uint256 _proposalId, address _account, VoteOption _voteOption) internal view override returns (bool) {
         Proposal storage proposal_ = proposals[_proposalId];
 
         // The proposal vote hasn't started or has already ended.
@@ -223,10 +185,7 @@ contract Nation3Voting is IMembership, MajorityVotingBase {
         }
 
         // The voter has already voted but vote replacment is not allowed.
-        if (
-            proposal_.voters[_account] != VoteOption.None &&
-            proposal_.parameters.votingMode != VotingMode.VoteReplacement
-        ) {
+        if (proposal_.voters[_account] != VoteOption.None && proposal_.parameters.votingMode != VotingMode.VoteReplacement) {
             return false;
         }
 

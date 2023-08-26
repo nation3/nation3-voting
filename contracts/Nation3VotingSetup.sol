@@ -2,21 +2,21 @@
 
 pragma solidity 0.8.17;
 
-import {Clones} from "@openzeppelin/contracts/proxy/Clones.sol";
-import {Address} from "@openzeppelin/contracts/utils/Address.sol";
-import {ERC165Checker} from "@openzeppelin/contracts/utils/introspection/ERC165Checker.sol";
-import {IERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
-import {IVotesUpgradeable} from "@openzeppelin/contracts-upgradeable/governance/utils/IVotesUpgradeable.sol";
+import { Clones } from "@openzeppelin/contracts/proxy/Clones.sol";
+import { Address } from "@openzeppelin/contracts/utils/Address.sol";
+import { ERC165Checker } from "@openzeppelin/contracts/utils/introspection/ERC165Checker.sol";
+import { IERC20Upgradeable } from "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import { IVotesUpgradeable } from "@openzeppelin/contracts-upgradeable/governance/utils/IVotesUpgradeable.sol";
 
-import {IDAO} from "@aragon/osx/core/plugin/Plugin.sol";
-import {DAO} from "@aragon/osx/core/dao/DAO.sol";
-import {PermissionLib} from "@aragon/osx/core/permission/PermissionLib.sol";
-import {PluginSetup, IPluginSetup} from '@aragon/osx/framework/plugin/setup/PluginSetup.sol';
-import {GovernanceERC20} from "@aragon/osx/token/ERC20/governance/GovernanceERC20.sol";
-import {GovernanceWrappedERC20} from "@aragon/osx/token/ERC20/governance/GovernanceWrappedERC20.sol";
-import {IGovernanceWrappedERC20} from "@aragon/osx/token/ERC20/governance/IGovernanceWrappedERC20.sol";
-import {MajorityVotingBase} from "@aragon/osx/plugins/governance/majority-voting/MajorityVotingBase.sol";
-import {Nation3Voting} from "./Nation3Voting.sol";
+import { IDAO } from "@aragon/osx/core/plugin/Plugin.sol";
+import { DAO } from "@aragon/osx/core/dao/DAO.sol";
+import { PermissionLib } from "@aragon/osx/core/permission/PermissionLib.sol";
+import { PluginSetup, IPluginSetup } from "@aragon/osx/framework/plugin/setup/PluginSetup.sol";
+import { GovernanceERC20 } from "@aragon/osx/token/ERC20/governance/GovernanceERC20.sol";
+import { GovernanceWrappedERC20 } from "@aragon/osx/token/ERC20/governance/GovernanceWrappedERC20.sol";
+import { IGovernanceWrappedERC20 } from "@aragon/osx/token/ERC20/governance/IGovernanceWrappedERC20.sol";
+import { MajorityVotingBase } from "@aragon/osx/plugins/governance/majority-voting/MajorityVotingBase.sol";
+import { Nation3Voting } from "./Nation3Voting.sol";
 
 /// @title Nation3VotingSetup
 /// @author Nation3 DAO - 2022-2023
@@ -60,20 +60,14 @@ contract Nation3VotingSetup is PluginSetup {
     /// @notice The contract constructor deploying the plugin implementation contract and receiving the governance token base contracts to clone from.
     /// @param _governanceERC20Base The base `GovernanceERC20` contract to create clones from.
     /// @param _governanceWrappedERC20Base The base `GovernanceWrappedERC20` contract to create clones from.
-    constructor(
-        GovernanceERC20 _governanceERC20Base,
-        GovernanceWrappedERC20 _governanceWrappedERC20Base
-    ) {
+    constructor(GovernanceERC20 _governanceERC20Base, GovernanceWrappedERC20 _governanceWrappedERC20Base) {
         nation3VotingBase = new Nation3Voting();
         governanceERC20Base = address(_governanceERC20Base);
         governanceWrappedERC20Base = address(_governanceWrappedERC20Base);
     }
 
     /// @inheritdoc IPluginSetup
-    function prepareInstallation(
-        address _dao,
-        bytes calldata _data
-    ) external returns (address plugin, PreparedSetupData memory preparedSetupData) {
+    function prepareInstallation(address _dao, bytes calldata _data) external returns (address plugin, PreparedSetupData memory preparedSetupData) {
         // Decode `_data` to extract the params needed for deploying and initializing `Nation3Voting` plugin,
         // and the required helpers
         (
@@ -81,10 +75,7 @@ contract Nation3VotingSetup is PluginSetup {
             TokenSettings memory tokenSettings,
             // only used for GovernanceERC20(token is not passed)
             GovernanceERC20.MintSettings memory mintSettings
-        ) = abi.decode(
-                _data,
-                (MajorityVotingBase.VotingSettings, TokenSettings, GovernanceERC20.MintSettings)
-            );
+        ) = abi.decode(_data, (MajorityVotingBase.VotingSettings, TokenSettings, GovernanceERC20.MintSettings));
 
         address token = tokenSettings.addr;
 
@@ -116,74 +107,35 @@ contract Nation3VotingSetup is PluginSetup {
                 // User already has a token. We need to wrap it in
                 // GovernanceWrappedERC20 in order to make the token
                 // include governance functionality.
-                GovernanceWrappedERC20(token).initialize(
-                    IERC20Upgradeable(tokenSettings.addr),
-                    tokenSettings.name,
-                    tokenSettings.symbol
-                );
+                GovernanceWrappedERC20(token).initialize(IERC20Upgradeable(tokenSettings.addr), tokenSettings.name, tokenSettings.symbol);
             }
         } else {
             // Clone a `GovernanceERC20`.
             token = governanceERC20Base.clone();
-            GovernanceERC20(token).initialize(
-                IDAO(_dao),
-                tokenSettings.name,
-                tokenSettings.symbol,
-                mintSettings
-            );
+            GovernanceERC20(token).initialize(IDAO(_dao), tokenSettings.name, tokenSettings.symbol, mintSettings);
         }
 
         helpers[0] = token;
 
         // Prepare and deploy plugin proxy.
-        plugin = createERC1967Proxy(
-            address(nation3VotingBase),
-            abi.encodeWithSelector(Nation3Voting.initialize.selector, _dao, votingSettings, token)
-        );
+        plugin = createERC1967Proxy(address(nation3VotingBase), abi.encodeWithSelector(Nation3Voting.initialize.selector, _dao, votingSettings, token));
 
         // Prepare permissions
-        PermissionLib.MultiTargetPermission[]
-            memory permissions = new PermissionLib.MultiTargetPermission[](
-                tokenSettings.addr != address(0) ? 3 : 4
-            );
+        PermissionLib.MultiTargetPermission[] memory permissions = new PermissionLib.MultiTargetPermission[](tokenSettings.addr != address(0) ? 3 : 4);
 
         // Set plugin permissions to be granted.
         // Grant the list of permissions of the plugin to the DAO.
-        permissions[0] = PermissionLib.MultiTargetPermission(
-            PermissionLib.Operation.Grant,
-            plugin,
-            _dao,
-            PermissionLib.NO_CONDITION,
-            nation3VotingBase.UPDATE_VOTING_SETTINGS_PERMISSION_ID()
-        );
+        permissions[0] = PermissionLib.MultiTargetPermission(PermissionLib.Operation.Grant, plugin, _dao, PermissionLib.NO_CONDITION, nation3VotingBase.UPDATE_VOTING_SETTINGS_PERMISSION_ID());
 
-        permissions[1] = PermissionLib.MultiTargetPermission(
-            PermissionLib.Operation.Grant,
-            plugin,
-            _dao,
-            PermissionLib.NO_CONDITION,
-            nation3VotingBase.UPGRADE_PLUGIN_PERMISSION_ID()
-        );
+        permissions[1] = PermissionLib.MultiTargetPermission(PermissionLib.Operation.Grant, plugin, _dao, PermissionLib.NO_CONDITION, nation3VotingBase.UPGRADE_PLUGIN_PERMISSION_ID());
 
         // Grant `EXECUTE_PERMISSION` of the DAO to the plugin.
-        permissions[2] = PermissionLib.MultiTargetPermission(
-            PermissionLib.Operation.Grant,
-            _dao,
-            plugin,
-            PermissionLib.NO_CONDITION,
-            DAO(payable(_dao)).EXECUTE_PERMISSION_ID()
-        );
+        permissions[2] = PermissionLib.MultiTargetPermission(PermissionLib.Operation.Grant, _dao, plugin, PermissionLib.NO_CONDITION, DAO(payable(_dao)).EXECUTE_PERMISSION_ID());
 
         if (tokenSettings.addr == address(0)) {
             bytes32 tokenMintPermission = GovernanceERC20(token).MINT_PERMISSION_ID();
 
-            permissions[3] = PermissionLib.MultiTargetPermission(
-                PermissionLib.Operation.Grant,
-                token,
-                _dao,
-                PermissionLib.NO_CONDITION,
-                tokenMintPermission
-            );
+            permissions[3] = PermissionLib.MultiTargetPermission(PermissionLib.Operation.Grant, token, _dao, PermissionLib.NO_CONDITION, tokenMintPermission);
         }
 
         preparedSetupData.helpers = helpers;
@@ -191,14 +143,11 @@ contract Nation3VotingSetup is PluginSetup {
     }
 
     /// @inheritdoc IPluginSetup
-    function prepareUninstallation(
-        address _dao,
-        SetupPayload calldata _payload
-    ) external view returns (PermissionLib.MultiTargetPermission[] memory permissions) {
+    function prepareUninstallation(address _dao, SetupPayload calldata _payload) external view returns (PermissionLib.MultiTargetPermission[] memory permissions) {
         // Prepare permissions.
         uint256 helperLength = _payload.currentHelpers.length;
         if (helperLength != 1) {
-            revert WrongHelpersArrayLength({length: helperLength});
+            revert WrongHelpersArrayLength({ length: helperLength });
         }
 
         // token can be either GovernanceERC20, GovernanceWrappedERC20, or IVotesUpgradeable, which
@@ -220,33 +169,15 @@ contract Nation3VotingSetup is PluginSetup {
             nation3VotingBase.UPDATE_VOTING_SETTINGS_PERMISSION_ID()
         );
 
-        permissions[1] = PermissionLib.MultiTargetPermission(
-            PermissionLib.Operation.Revoke,
-            _payload.plugin,
-            _dao,
-            PermissionLib.NO_CONDITION,
-            nation3VotingBase.UPGRADE_PLUGIN_PERMISSION_ID()
-        );
+        permissions[1] = PermissionLib.MultiTargetPermission(PermissionLib.Operation.Revoke, _payload.plugin, _dao, PermissionLib.NO_CONDITION, nation3VotingBase.UPGRADE_PLUGIN_PERMISSION_ID());
 
-        permissions[2] = PermissionLib.MultiTargetPermission(
-            PermissionLib.Operation.Revoke,
-            _dao,
-            _payload.plugin,
-            PermissionLib.NO_CONDITION,
-            DAO(payable(_dao)).EXECUTE_PERMISSION_ID()
-        );
+        permissions[2] = PermissionLib.MultiTargetPermission(PermissionLib.Operation.Revoke, _dao, _payload.plugin, PermissionLib.NO_CONDITION, DAO(payable(_dao)).EXECUTE_PERMISSION_ID());
 
         // Revocation of permission is necessary only if the deployed token is GovernanceERC20,
         // as GovernanceWrapped does not possess this permission. Only return the following
         // if it's type of GovernanceERC20, otherwise revoking this permission wouldn't have any effect.
         if (isGovernanceERC20) {
-            permissions[3] = PermissionLib.MultiTargetPermission(
-                PermissionLib.Operation.Revoke,
-                token,
-                _dao,
-                PermissionLib.NO_CONDITION,
-                GovernanceERC20(token).MINT_PERMISSION_ID()
-            );
+            permissions[3] = PermissionLib.MultiTargetPermission(PermissionLib.Operation.Revoke, token, _dao, PermissionLib.NO_CONDITION, GovernanceERC20(token).MINT_PERMISSION_ID());
         }
     }
 
@@ -270,9 +201,7 @@ contract Nation3VotingSetup is PluginSetup {
     /// @dev It's important to first check whether token is a contract prior to this call.
     /// @param token The token address
     function _isERC20(address token) private view returns (bool) {
-        (bool success, bytes memory data) = token.staticcall(
-            abi.encodeWithSelector(IERC20Upgradeable.balanceOf.selector, address(this))
-        );
+        (bool success, bytes memory data) = token.staticcall(abi.encodeWithSelector(IERC20Upgradeable.balanceOf.selector, address(this)));
         return success && data.length == 0x20;
     }
 }

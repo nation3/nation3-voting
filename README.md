@@ -1,4 +1,4 @@
-# Hardhat Template [![Open in Gitpod][gitpod-badge]][gitpod] [![Github Actions][gha-badge]][gha] [![Hardhat][hardhat-badge]][hardhat] [![License: MIT][license-badge]][license]
+# Nation3 Voting Plugin [![Open in Gitpod][gitpod-badge]][gitpod] [![Github Actions][gha-badge]][gha] [![Hardhat][hardhat-badge]][hardhat] [![License: MIT][license-badge]][license]
 
 [gitpod]: https://gitpod.io/#https://github.com/paulrberg/hardhat-template
 [gitpod-badge]: https://img.shields.io/badge/Gitpod-Open%20in%20Gitpod-FFB45B?logo=gitpod
@@ -9,7 +9,7 @@
 [license]: https://opensource.org/licenses/MIT
 [license-badge]: https://img.shields.io/badge/License-MIT-blue.svg
 
-A Hardhat-based template for developing Solidity smart contracts, with sensible defaults.
+An AragonOSx plugin.
 
 - [Hardhat](https://github.com/nomiclabs/hardhat): compile, run and test smart contracts
 - [TypeChain](https://github.com/ethereum-ts/TypeChain): generate TypeScript bindings for smart contracts
@@ -17,11 +17,14 @@ A Hardhat-based template for developing Solidity smart contracts, with sensible 
 - [Solhint](https://github.com/protofire/solhint): code linter
 - [Solcover](https://github.com/sc-forks/solidity-coverage): code coverage
 - [Prettier Plugin Solidity](https://github.com/prettier-solidity/prettier-plugin-solidity): code formatter
+- [Aragon OSx Contracts](https://github.com/aragon/osx): aragon core contract library
+- [OpenZeppelin Contracts](https://github.com/OpenZeppelin/openzeppelin-contracts): secure smart contract library
 
 ## Getting Started
 
-Click the [`Use this template`](https://github.com/paulrberg/hardhat-template/generate) button at the top of the page to
-create a new repository with this repo as the initial state.
+Nation3 Voting Plugin enables decentralized voting for Nation3 passport holders. This plugin implements a 1 passport 1
+vote system, where each valid Nation3 passport holder gets an equal vote on proposals in Aragon DAO where plugin is
+installed.
 
 ## Features
 
@@ -31,27 +34,6 @@ please consult their respective documentations.
 For example, for Hardhat, you can refer to the [Hardhat Tutorial](https://hardhat.org/tutorial) and the
 [Hardhat Docs](https://hardhat.org/docs). You might be in particular interested in reading the
 [Testing Contracts](https://hardhat.org/tutorial/testing-contracts) section.
-
-### Sensible Defaults
-
-This template comes with sensible default configurations in the following files:
-
-```text
-├── .editorconfig
-├── .eslintignore
-├── .eslintrc.yml
-├── .gitignore
-├── .prettierignore
-├── .prettierrc.yml
-├── .solcover.js
-├── .solhint.json
-└── hardhat.config.ts
-```
-
-### VSCode Integration
-
-This template is IDE agnostic, but for the best user experience, you may want to use it in VSCode alongside Nomic
-Foundation's [Solidity extension](https://marketplace.visualstudio.com/items?itemName=NomicFoundation.hardhat-solidity).
 
 ### GitHub Actions
 
@@ -73,7 +55,7 @@ this [website](https://iancoleman.io/bip39/) to generate one.
 Then, proceed with installing dependencies:
 
 ```sh
-$ pnpm install
+pnpm install
 ```
 
 ### Compile
@@ -81,7 +63,7 @@ $ pnpm install
 Compile the smart contracts with Hardhat:
 
 ```sh
-$ pnpm compile
+pnpm compile
 ```
 
 ### TypeChain
@@ -89,7 +71,7 @@ $ pnpm compile
 Compile the smart contracts and generate TypeChain bindings:
 
 ```sh
-$ pnpm typechain
+pnpm typechain
 ```
 
 ### Test
@@ -97,7 +79,7 @@ $ pnpm typechain
 Run the tests with Hardhat:
 
 ```sh
-$ pnpm test
+pnpm test
 ```
 
 ### Lint Solidity
@@ -105,7 +87,7 @@ $ pnpm test
 Lint the Solidity code:
 
 ```sh
-$ pnpm lint:sol
+pnpm lint:sol
 ```
 
 ### Lint TypeScript
@@ -113,7 +95,7 @@ $ pnpm lint:sol
 Lint the TypeScript code:
 
 ```sh
-$ pnpm lint:ts
+pnpm lint:ts
 ```
 
 ### Coverage
@@ -121,7 +103,7 @@ $ pnpm lint:ts
 Generate the code coverage report:
 
 ```sh
-$ pnpm coverage
+pnpm coverage
 ```
 
 ### Report Gas
@@ -129,7 +111,7 @@ $ pnpm coverage
 See the gas usage per unit test and average gas per method call:
 
 ```sh
-$ REPORT_GAS=true pnpm test
+REPORT_GAS=true pnpm test
 ```
 
 ### Clean
@@ -137,7 +119,7 @@ $ REPORT_GAS=true pnpm test
 Delete the smart contract artifacts, the coverage reports and the Hardhat cache:
 
 ```sh
-$ pnpm clean
+pnpm clean
 ```
 
 ### Deploy
@@ -145,7 +127,7 @@ $ pnpm clean
 Deploy the contracts to Hardhat Network:
 
 ```sh
-$ pnpm deploy:contracts
+pnpm deploy:contracts
 ```
 
 ### Tasks
@@ -155,7 +137,7 @@ $ pnpm deploy:contracts
 Deploy a new instance of the Greeter contract via a task:
 
 ```sh
-$ pnpm task:deployGreeter --network ganache --greeting "Bonjour, le monde!"
+pnpm task:deployGreeter --network ganache --greeting "Bonjour, le monde!"
 ```
 
 #### Set Greeting
@@ -163,7 +145,7 @@ $ pnpm task:deployGreeter --network ganache --greeting "Bonjour, le monde!"
 Run the `setGreeting` task on the Ganache network:
 
 ```sh
-$ pnpm task:setGreeting --network ganache --greeting "Bonjour, le monde!" --account 3
+pnpm task:setGreeting --network ganache --greeting "Bonjour, le monde!" --account 3
 ```
 
 ## Tips
@@ -185,13 +167,13 @@ on/off.
 ### Install Ganache
 
 ```sh
-$ npm i -g ganache
+npm i -g ganache
 ```
 
 ### Run a Development Blockchain
 
 ```sh
-$ ganache -s test
+ganache -s test
 ```
 
 > The `-s test` passes a seed to the local chain and makes it deterministic
