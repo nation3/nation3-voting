@@ -40,6 +40,7 @@ contract Nation3VotingSetup is PluginSetup {
     /// @param symbol The token symbol. This parameter is only relevant if the token address is `address(0)`.
     struct TokenSettings {
         address addr;
+        string name;
         string symbol;
     }
 
