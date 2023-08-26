@@ -1,6 +1,6 @@
 {
   "name": "@nation3/nation3-voting",
-  "description": "",
+  "description": "Nation3 Voting Aragon Plugin",
   "version": "1.0.0",
   "author": {
     "name": "nation3",
@@ -54,7 +54,6 @@
     "hardhat",
     "smart-contracts",
     "solidity",
-    "template",
     "typescript",
     "typechain"
   ],
