@@ -89,7 +89,7 @@ contract Nation3VotingSetup is PluginSetup {
             }
 
             if (!_isERC20(token)) {
-                revert TokenNotERC20(token);
+                revert TokenNotERC721(token);
             }
 
             // [0] = IERC20Upgradeable, [1] = IVotesUpgradeable, [2] = IGovernanceWrappedERC20
