@@ -32,8 +32,12 @@ contract Nation3Voting is IMembership, MajorityVotingBase {
     /// @dev This method is required to support [ERC-1822](https://eips.ethereum.org/EIPS/eip-1822).
     /// @param _dao The IDAO interface of the associated DAO.
     /// @param _votingSettings The voting settings.
-    /// @param _token The [ERC-20](https://eips.ethereum.org/EIPS/eip-20) token used for voting.
-    function initialize(IDAO _dao, VotingSettings calldata _votingSettings, IVotesUpgradeable _token) external initializer {
+    /// @param _token The [ERC-721](https://eips.ethereum.org/EIPS/eip-721) token used for voting.
+    function initialize(
+        IDAO _dao,
+        VotingSettings calldata _votingSettings,
+        IVotesUpgradeable _token
+    ) external initializer {
         __MajorityVotingBase_init(_dao, _votingSettings);
 
         votingToken = _token;
@@ -45,7 +49,10 @@ contract Nation3Voting is IMembership, MajorityVotingBase {
     /// @param _interfaceId The ID of the interface.
     /// @return Returns `true` if the interface is supported.
     function supportsInterface(bytes4 _interfaceId) public view virtual override returns (bool) {
-        return _interfaceId == TOKEN_VOTING_INTERFACE_ID || _interfaceId == type(IMembership).interfaceId || super.supportsInterface(_interfaceId);
+        return
+            _interfaceId == TOKEN_VOTING_INTERFACE_ID ||
+            _interfaceId == type(IMembership).interfaceId ||
+            super.supportsInterface(_interfaceId);
     }
 
     /// @notice getter function for the voting token.
@@ -76,7 +83,10 @@ contract Nation3Voting is IMembership, MajorityVotingBase {
 
             if (minProposerVotingPower_ != 0) {
                 // Because of the checks in `TokenVotingSetup`, we can assume that `votingToken` is an [ERC-20](https://eips.ethereum.org/EIPS/eip-20) token.
-                if (votingToken.getVotes(_msgSender()) < minProposerVotingPower_ && IERC20Upgradeable(address(votingToken)).balanceOf(_msgSender()) < minProposerVotingPower_) {
+                if (
+                    votingToken.getVotes(_msgSender()) < minProposerVotingPower_ &&
+                    IERC20Upgradeable(address(votingToken)).balanceOf(_msgSender()) < minProposerVotingPower_
+                ) {
                     revert ProposalCreationForbidden(_msgSender());
                 }
             }
@@ -95,7 +105,14 @@ contract Nation3Voting is IMembership, MajorityVotingBase {
 
         (_startDate, _endDate) = _validateProposalDates(_startDate, _endDate);
 
-        proposalId = _createProposal({ _creator: _msgSender(), _metadata: _metadata, _startDate: _startDate, _endDate: _endDate, _actions: _actions, _allowFailureMap: _allowFailureMap });
+        proposalId = _createProposal({
+            _creator: _msgSender(),
+            _metadata: _metadata,
+            _startDate: _startDate,
+            _endDate: _endDate,
+            _actions: _actions,
+            _allowFailureMap: _allowFailureMap
+        });
 
         // Store proposal related information
         Proposal storage proposal_ = proposals[proposalId];
@@ -131,7 +148,12 @@ contract Nation3Voting is IMembership, MajorityVotingBase {
     }
 
     /// @inheritdoc MajorityVotingBase
-    function _vote(uint256 _proposalId, VoteOption _voteOption, address _voter, bool _tryEarlyExecution) internal override {
+    function _vote(
+        uint256 _proposalId,
+        VoteOption _voteOption,
+        address _voter,
+        bool _tryEarlyExecution
+    ) internal override {
         Proposal storage proposal_ = proposals[_proposalId];
 
         // This could re-enter, though we can assume the governance token is not malicious
@@ -166,7 +188,11 @@ contract Nation3Voting is IMembership, MajorityVotingBase {
     }
 
     /// @inheritdoc MajorityVotingBase
-    function _canVote(uint256 _proposalId, address _account, VoteOption _voteOption) internal view override returns (bool) {
+    function _canVote(
+        uint256 _proposalId,
+        address _account,
+        VoteOption _voteOption
+    ) internal view override returns (bool) {
         Proposal storage proposal_ = proposals[_proposalId];
 
         // The proposal vote hasn't started or has already ended.
@@ -185,7 +211,10 @@ contract Nation3Voting is IMembership, MajorityVotingBase {
         }
 
         // The voter has already voted but vote replacment is not allowed.
-        if (proposal_.voters[_account] != VoteOption.None && proposal_.parameters.votingMode != VotingMode.VoteReplacement) {
+        if (
+            proposal_.voters[_account] != VoteOption.None &&
+            proposal_.parameters.votingMode != VotingMode.VoteReplacement
+        ) {
             return false;
         }
 
