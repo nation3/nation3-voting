@@ -17,7 +17,7 @@ import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/I
 import { ERC165Upgradeable } from "@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol";
 import { DaoAuthorizableUpgradeable } from "@aragon/osx/core/plugin/dao-authorizable/DaoAuthorizableUpgradeable.sol";
 import { IDAO } from "@aragon/osx/core/dao/IDAO.sol";
-import { IPassportWrapper } from "./IPassportWrapper.sol";
+import { IPassportWrapped } from "./IPassportWrapped.sol";
 
 /// @title PassportWrapper
 /// @author Nation3 DAO
@@ -27,21 +27,19 @@ import { IPassportWrapper } from "./IPassportWrapper.sol";
 /// 2. call `depositFor` to wrap them, which safely transfers the underlying [ERC-721](https://eips.ethereum.org/EIPS/eip-721) tokens to the contract and mints wrapped [ERC-721](https://eips.ethereum.org/EIPS/eip-721) tokens.
 /// To get the [ERC-721](https://eips.ethereum.org/EIPS/eip-721) tokens back, the owner of the wrapped tokens can call `withdrawFor`, which  burns the wrapped [ERC-721](https://eips.ethereum.org/EIPS/eip-721) tokens and safely transfers the underlying tokens back to the owner.
 /// @dev This contract intentionally has no public mint functionality because this is the responsibility of the underlying [ERC-20](https://eips.ethereum.org/EIPS/eip-20) token contract.
-contract PasspoerWrapped is IPassportWrapper, Initializable, ERC165Upgradeable, ERC721Votes, ERC721Wrapper {
+contract PassportWrapped is IPassportWrapped, ERC165Upgradeable, ERC721Votes, ERC721Wrapper {
     /// @notice Calls the initialize function.
     /// @param _token The underlying [ERC-20](https://eips.ethereum.org/EIPS/eip-20) token.
     /// @param _name The name of the wrapped token.
     /// @param _symbol The symbol of the wrapped token.
-    constructor(IERC721 _token, string memory _name, string memory _symbol) {
-        initialize(_token, _name, _symbol);
-    }
+    constructor(IERC721 _token, string memory _name, string memory _symbol) ERC721(_token, _name, _symbol) {}
 
     /// @notice Checks if this or the parent contract supports an interface by its ID.
     /// @param _interfaceId The ID of the interface.
     /// @return Returns `true` if the interface is supported.
     function supportsInterface(bytes4 _interfaceId) public view virtual override returns (bool) {
         return
-            _interfaceId == type(IPassportWrapper).interfaceId ||
+            _interfaceId == type(IPassportWrapped).interfaceId ||
             _interfaceId == type(IERC721).interfaceId ||
             _interfaceId == type(IERC20PermitUpgradeable).interfaceId ||
             _interfaceId == type(IERC20MetadataUpgradeable).interfaceId ||
@@ -55,19 +53,19 @@ contract PasspoerWrapped is IPassportWrapper, Initializable, ERC165Upgradeable, 
         return ERC721Wrapper.decimals();
     }
 
-    /// @inheritdoc IPassportWrapper
+    /// @inheritdoc IPassportWrapped
     function depositFor(
         address account,
         uint256 amount
-    ) public override(IPassportWrapper, ERC721Wrapper) returns (bool) {
+    ) public override(IPassportWrapped, ERC721Wrapper) returns (bool) {
         return ERC721Wrapper.depositFor(account, amount);
     }
 
-    /// @inheritdoc IPassportWrapper
+    /// @inheritdoc IPassportWrapped
     function withdrawTo(
         address account,
         uint256 amount
-    ) public override(IPassportWrapper, ERC721Wrapper) returns (bool) {
+    ) public override(IPassportWrapped, ERC721Wrapper) returns (bool) {
         return ERC721Wrapper.withdrawTo(account, amount);
     }
 
@@ -77,6 +75,7 @@ contract PasspoerWrapped is IPassportWrapper, Initializable, ERC165Upgradeable, 
         super._afterTokenTransfer(from, to, amount);
 
         // Automatically turn on delegation on mint/transfer but only for the first time.
+        // Look into this a bit more.
         if (to != address(0) && numCheckpoints(to) == 0 && delegates(to) == address(0)) {
             _delegate(to, to);
         }
