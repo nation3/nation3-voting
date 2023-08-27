@@ -10,6 +10,9 @@ dependencies:
   '@openzeppelin/contracts-upgradeable':
     specifier: ^4.9.3
     version: 4.9.3
+  solmate:
+    specifier: ^6.2.0
+    version: 6.2.0
 
 devDependencies:
   '@nomicfoundation/hardhat-chai-matchers':
@@ -6729,6 +6732,10 @@ packages:
     transitivePeerDependencies:
       - supports-color
     dev: true
+
+  /solmate@6.2.0:
+    resolution: {integrity: sha512-AM38ioQ2P8zRsA42zenb9or6OybRjOLXIu3lhIT8rhddUuduCt76pUEuLxOIg9GByGojGz+EbpFdCB6B+QZVVA==}
+    dev: false
 
   /source-map-support@0.5.21:
     resolution: {integrity: sha512-uBHU3L3czsIyYXKX88fdrGovxdSCoTGDRZ6SYXtSRxLZUzHg5P/66Ht6uoUlHu9EZod+inXhKo3qQgwXUT/y1w==}
