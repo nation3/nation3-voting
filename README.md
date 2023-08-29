@@ -1,185 +1,107 @@
-# Nation3 Voting Plugin [![Open in Gitpod][gitpod-badge]][gitpod] [![Github Actions][gha-badge]][gha] [![Hardhat][hardhat-badge]][hardhat] [![License: MIT][license-badge]][license]
+<img src="https://raw.githubusercontent.com/defi-wonderland/brand/v1.0.0/external/solidity-foundry-boilerplate-banner.png" alt="wonderland banner" align="center" />
+<br />
 
-[gitpod]: https://gitpod.io/#https://github.com/paulrberg/hardhat-template
-[gitpod-badge]: https://img.shields.io/badge/Gitpod-Open%20in%20Gitpod-FFB45B?logo=gitpod
-[gha]: https://github.com/paulrberg/hardhat-template/actions
-[gha-badge]: https://github.com/paulrberg/hardhat-template/actions/workflows/ci.yml/badge.svg
-[hardhat]: https://hardhat.org/
-[hardhat-badge]: https://img.shields.io/badge/Built%20with-Hardhat-FFDB1C.svg
-[license]: https://opensource.org/licenses/MIT
-[license-badge]: https://img.shields.io/badge/License-MIT-blue.svg
+<div align="center"><strong>Start your next Solidity project with Foundry in seconds</strong></div>
+<div align="center">A highly scalable foundation focused on DX and best practices</div>
 
-An AragonOSx plugin.
-
-- [Hardhat](https://github.com/nomiclabs/hardhat): compile, run and test smart contracts
-- [TypeChain](https://github.com/ethereum-ts/TypeChain): generate TypeScript bindings for smart contracts
-- [Ethers](https://github.com/ethers-io/ethers.js/): renowned Ethereum library and wallet implementation
-- [Solhint](https://github.com/protofire/solhint): code linter
-- [Solcover](https://github.com/sc-forks/solidity-coverage): code coverage
-- [Prettier Plugin Solidity](https://github.com/prettier-solidity/prettier-plugin-solidity): code formatter
-- [Aragon OSx Contracts](https://github.com/aragon/osx): aragon core contract library
-- [OpenZeppelin Contracts](https://github.com/OpenZeppelin/openzeppelin-contracts): secure smart contract library
-
-## Getting Started
-
-Nation3 Voting Plugin enables decentralized voting for Nation3 passport holders. This plugin implements a 1 passport 1
-vote system, where each valid Nation3 passport holder gets an equal vote on proposals in Aragon DAO where plugin is
-installed.
+<br />
 
 ## Features
 
-This template builds upon the frameworks and libraries mentioned above, so for details about their specific features,
-please consult their respective documentations.
+<dl>
+  <dt>Sample contracts</dt>
+  <dd>Basic Greeter contract with an external interface.</dd>
 
-For example, for Hardhat, you can refer to the [Hardhat Tutorial](https://hardhat.org/tutorial) and the
-[Hardhat Docs](https://hardhat.org/docs). You might be in particular interested in reading the
-[Testing Contracts](https://hardhat.org/tutorial/testing-contracts) section.
+  <dt>Foundry setup</dt>
+  <dd>Foundry configuration with multiple custom profiles and remappings.</dd>
 
-### GitHub Actions
+  <dt>Deployment scripts</dt>
+  <dd>Sample scripts to deploy contracts on both mainnet and testnet.</dd>
 
-This template comes with GitHub Actions pre-configured. Your contracts will be linted and tested on every push and pull
-request made to the `main` branch.
+  <dt>Sample e2e & unit tests</dt>
+  <dd>Example tests showcasing mocking, assertions and configuration for mainnet forking. As well it includes everything needed in order to check code coverage.</dd>
 
-Note though that to make this work, you must use your `INFURA_API_KEY` and your `MNEMONIC` as GitHub secrets.
+  <dt>Linter</dt>
+  <dd>Simple and fast solidity linting thanks to forge fmt</a>.</dd>
 
-You can edit the CI script in [.github/workflows/ci.yml](./.github/workflows/ci.yml).
+  <dt>Github workflows CI</dt>
+  <dd>Run all tests and see the coverage as you push your changes.</dd>
+</dl>
 
-## Usage
+## Setup
 
-### Pre Requisites
+1. Install Foundry by following the instructions from [their repository](https://github.com/foundry-rs/foundry#installation).
+2. Copy the `.env.example` file to `.env` and fill in the variables.
+3. Install the dependencies by running: `yarn install`. In case there is an error with the commands, run `foundryup` and try them again.
 
-Before being able to run any command, you need to create a `.env` file and set a BIP-39 compatible mnemonic as an
-environment variable. You can follow the example in `.env.example`. If you don't already have a mnemonic, you can use
-this [website](https://iancoleman.io/bip39/) to generate one.
+## Build
 
-Then, proceed with installing dependencies:
+The default way to build the code is suboptimal but fast, you can run it via:
 
-```sh
-pnpm install
+```bash
+yarn build
 ```
 
-### Compile
+In order to build a more optimized code ([via IR](https://docs.soliditylang.org/en/v0.8.15/ir-breaking-changes.html#solidity-ir-based-codegen-changes)), run:
 
-Compile the smart contracts with Hardhat:
-
-```sh
-pnpm compile
+```bash
+yarn build:optimized
 ```
 
-### TypeChain
+## Running tests
 
-Compile the smart contracts and generate TypeChain bindings:
+Unit tests should be isolated from any externalities, while E2E usually run in a fork of the blockchain. In this boilerplate you will find example of both.
 
-```sh
-pnpm typechain
+In order to run both unit and E2E tests, run:
+
+```bash
+yarn test
 ```
 
-### Test
+In order to just run unit tests, run:
 
-Run the tests with Hardhat:
-
-```sh
-pnpm test
+```bash
+yarn test:unit
 ```
 
-### Lint Solidity
+In order to run unit tests and run way more fuzzing than usual (5x), run:
 
-Lint the Solidity code:
-
-```sh
-pnpm lint:sol
+```bash
+yarn test:unit:deep
 ```
 
-### Lint TypeScript
+In order to just run e2e tests, run:
 
-Lint the TypeScript code:
-
-```sh
-pnpm lint:ts
+```bash
+yarn test:e2e
 ```
 
-### Coverage
+In order to check your current code coverage, run:
 
-Generate the code coverage report:
-
-```sh
-pnpm coverage
+```bash
+yarn coverage
 ```
 
-### Report Gas
+<br>
 
-See the gas usage per unit test and average gas per method call:
+## Deploy & verify
 
-```sh
-REPORT_GAS=true pnpm test
+### Setup
+
+Configure the `.env` variables.
+
+### Goerli
+
+```bash
+yarn deploy:goerli
 ```
 
-### Clean
+### Mainnet
 
-Delete the smart contract artifacts, the coverage reports and the Hardhat cache:
-
-```sh
-pnpm clean
+```bash
+yarn deploy:mainnet
 ```
 
-### Deploy
+The deployments are stored in ./broadcast
 
-Deploy the contracts to Hardhat Network:
-
-```sh
-pnpm deploy:contracts
-```
-
-### Tasks
-
-#### Deploy Greeter
-
-Deploy a new instance of the Greeter contract via a task:
-
-```sh
-pnpm task:deployGreeter --network ganache --greeting "Bonjour, le monde!"
-```
-
-#### Set Greeting
-
-Run the `setGreeting` task on the Ganache network:
-
-```sh
-pnpm task:setGreeting --network ganache --greeting "Bonjour, le monde!" --account 3
-```
-
-## Tips
-
-### Syntax Highlighting
-
-If you use VSCode, you can get Solidity syntax highlighting with the
-[hardhat-solidity](https://marketplace.visualstudio.com/items?itemName=NomicFoundation.hardhat-solidity) extension.
-
-## Using GitPod
-
-[GitPod](https://www.gitpod.io/) is an open-source developer platform for remote development.
-
-To view the coverage report generated by `pnpm coverage`, just click `Go Live` from the status bar to turn the server
-on/off.
-
-## Local development with Ganache
-
-### Install Ganache
-
-```sh
-npm i -g ganache
-```
-
-### Run a Development Blockchain
-
-```sh
-ganache -s test
-```
-
-> The `-s test` passes a seed to the local chain and makes it deterministic
-
-Make sure to set the mnemonic in your `.env` file to that of the instance running with Ganache.
-
-## License
-
-This project is licensed under MIT.
+See the [Foundry Book for available options](https://book.getfoundry.sh/reference/forge/forge-create.html).

@@ -1,84 +1,56 @@
 {
-  "name": "@nation3/nation3-voting",
-  "description": "Nation3 Voting Aragon Plugin",
+  "name": "nation3-voting",
   "version": "1.0.0",
-  "author": {
-    "name": "nation3",
-    "url": "https://github.com/nation3"
+  "private": true,
+  "description": "A voting shim for Nation3 Passports to integrate with Aragon OSx",
+  
+  "homepage": "https://github.com/nation3/nation3-voting#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/defi-wonderland/solidity-foundry-boilerplate.git"
   },
-  "devDependencies": {
-    "@nomicfoundation/hardhat-chai-matchers": "^2.0.0",
-    "@nomicfoundation/hardhat-ethers": "^3.0.0",
-    "@nomicfoundation/hardhat-network-helpers": "^1.0.6",
-    "@nomicfoundation/hardhat-toolbox": "^3.0.0",
-    "@nomicfoundation/hardhat-verify": "^1.0.0",
-    "@trivago/prettier-plugin-sort-imports": "^4.0.0",
-    "@typechain/ethers-v6": "^0.4.0",
-    "@typechain/hardhat": "^8.0.0",
-    "@types/chai": "^4.3.4",
-    "@types/fs-extra": "^9.0.13",
-    "@types/mocha": "^10.0.0",
-    "@types/node": "^18.11.9",
-    "@typescript-eslint/eslint-plugin": "^5.44.0",
-    "@typescript-eslint/parser": "^5.44.0",
-    "chai": "^4.3.7",
-    "cross-env": "^7.0.3",
-    "dotenv": "^16.0.3",
-    "eslint": "^8.28.0",
-    "eslint-config-prettier": "^8.5.0",
-    "ethers": "^6.4.0",
-    "fs-extra": "^10.1.0",
-    "hardhat": "^2.12.2",
-    "hardhat-deploy": "^0.11.29",
-    "hardhat-gas-reporter": "^1.0.9",
-    "lodash": "^4.17.21",
-    "mocha": "^10.1.0",
-    "prettier": "^2.8.4",
-    "prettier-plugin-solidity": "^1.1.2",
-    "rimraf": "^4.1.2",
-    "solhint": "^3.4.0",
-    "solhint-plugin-prettier": "^0.0.5",
-    "solidity-coverage": "^0.8.2",
-    "ts-generator": "^0.1.1",
-    "ts-node": "^10.9.1",
-    "typechain": "^8.2.0",
-    "typescript": "^4.9.3"
-  },
-  "files": [
-    "contracts"
+  "license": "GPL-3.0-or-later",
+  "author": "Nation3",
+  "contributors": [
+    "pythonpete32 (https://github.com/pythonpete32)",
+    "okhaimie-dev (https://github.com/okhaimie-dev)"
   ],
-  "keywords": [
-    "blockchain",
-    "ethers",
-    "ethereum",
-    "hardhat",
-    "smart-contracts",
-    "solidity",
-    "typescript",
-    "typechain"
-  ],
-  "publishConfig": {
-    "access": "public"
-  },
   "scripts": {
-    "clean": "rimraf ./artifacts ./cache ./coverage ./types ./coverage.json && pnpm typechain",
-    "compile": "cross-env TS_NODE_TRANSPILE_ONLY=true hardhat compile",
-    "coverage": "hardhat coverage --solcoverjs ./.solcover.js --temp artifacts --testfiles \"test/**/*.ts\" && pnpm typechain",
-    "deploy:contracts": "hardhat deploy",
-    "lint": "pnpm lint:sol && pnpm lint:ts && pnpm prettier:check",
-    "lint:sol": "solhint --max-warnings 0 \"contracts/**/*.sol\"",
-    "lint:ts": "eslint --ignore-path ./.eslintignore --ext .js,.ts .",
-    "postinstall": "DOTENV_CONFIG_PATH=./.env.example pnpm typechain",
-    "prettier:check": "prettier --check \"**/*.{js,json,md,sol,ts,yml}\"",
-    "prettier:write": "prettier --write \"**/*.{js,json,md,sol,ts,yml}\"",
-    "task:deployGreeter": "hardhat task:deployGreeter",
-    "task:setGreeting": "hardhat task:setGreeting",
-    "test": "hardhat test",
-    "typechain": "cross-env TS_NODE_TRANSPILE_ONLY=true hardhat typechain"
+    "build": "forge build",
+    "build:optimized": "FOUNDRY_PROFILE=optimized forge build",
+    "coverage": "forge coverage --match-contract Unit",
+    "lint:check": "yarn lint:sol-tests && yarn lint:sol-logic && forge fmt check",
+    "lint:fix": "sort-package-json && forge fmt && yarn lint:sol-tests --fix && yarn lint:sol-logic --fix",
+    "lint:sol-logic": "solhint -c .solhint.json 'solidity/contracts/**/*.sol' 'solidity/interfaces/**/*.sol'",
+    "lint:sol-tests": "solhint 'solidity/test/**/*.sol'",
+    "prepare": "husky install",
+    "test": "forge test -vvv",
+    "test:e2e": "forge test --match-contract E2E -vvv",
+    "test:unit": "forge test --match-contract Unit -vvv",
+    "test:unit:deep": "FOUNDRY_FUZZ_RUNS=5000 yarn test:unit"
+  },
+  "lint-staged": {
+    "*.{js,css,md,ts,sol}": "forge fmt",
+    "*.sol": "solhint --fix 'solidity/**/*.sol",
+    "package.json": "sort-package-json"
   },
   "dependencies": {
     "@aragon/osx": "1.3.0-rc0.2",
+    "@ensdomains/ens-contracts": "^0.0.22",
     "@openzeppelin/contracts": "^4.9.3",
-    "@openzeppelin/contracts-upgradeable": "^4.9.3"
+    "@openzeppelin/contracts-upgradeable": "^4.9.3",
+    "ds-test": "github:dapphub/ds-test#e282159",
+    "forge-std": "github:foundry-rs/forge-std#v1.5.6",
+    "isolmate": "github:defi-wonderland/isolmate#59e1804",
+    "prb/test": "github:paulrberg/prb-test#a245c71"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "17.0.3",
+    "@commitlint/config-conventional": "17.0.3",
+    "husky": ">=8",
+    "lint-staged": ">=10",
+    "solhint": "3.3.6",
+    "solhint-plugin-defi-wonderland": "1.1.0",
+    "sort-package-json": "1.53.1"
   }
 }

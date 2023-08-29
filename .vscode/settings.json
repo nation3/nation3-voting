@@ -1,6 +1,7 @@
 {
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true,
-  "prettier.documentSelectors": ["**/*.sol"],
-  "solidity.formatter": "prettier"
+  "solidity.compileUsingRemoteVersion": "v0.8.17",
+  "solidity.packageDefaultDependenciesContractsDirectory": "solidity",
+  "solidity.packageDefaultDependenciesDirectory": "node_modules",
+  "solidity.formatter": "forge"
 }
