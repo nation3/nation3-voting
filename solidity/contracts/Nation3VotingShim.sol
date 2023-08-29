@@ -3,7 +3,6 @@
 pragma solidity =0.8.17;
 
 import {Initializable} from '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
-
 import {ERC165Upgradeable} from '@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol';
 
 import {PluginUUPSUpgradeable} from '@aragon/osx/core/plugin/PluginUUPSUpgradeable.sol';
@@ -12,6 +11,7 @@ import {DaoAuthorizableUpgradeable} from '@aragon/osx/core/plugin/dao-authorizab
 import {IDAO} from '@aragon/osx/core/dao/IDAO.sol';
 
 import {IPassportIssuer} from '../interfaces/IPassportIssuer.sol';
+import {IPassport} from '../interfaces/IPassport.sol';
 import {IVoteEscrow} from '../interfaces/IVoteEscrow.sol';
 
 /// @title Nation3VotingShim
@@ -23,6 +23,8 @@ contract Nation3VotingShim is Initializable, ERC165Upgradeable, IVotesUpgradeabl
   IPassportIssuer private constant _passportIssuer = IPassportIssuer(0x279c0b6bfCBBA977eaF4ad1B2FFe3C208aa068aC);
   /// @dev Address of the VoteEscrow contract
   IVoteEscrow private constant _nation = IVoteEscrow(0x333A4823466879eeF910A04D473505da62142069);
+
+  IPassport private constant _passport = IPassport(0x3337dac9F251d4E403D6030E18e3cfB6a2cb1333);
 
   /// @notice The [ERC-165](https://eips.ethereum.org/EIPS/eip-165) interface ID of the contract.
   bytes4 internal constant NATION3_SHIM_INTERFACE_ID = this.initialize.selector;
@@ -74,8 +76,9 @@ contract Nation3VotingShim is Initializable, ERC165Upgradeable, IVotesUpgradeabl
 
   /// @inheritdoc IVotesUpgradeable
   /// @dev The timepoint is not used since we dont have the checkpointing mechanism. This means minting and burning after a vote is created will affect the quorum.
+  // solhint-disable-next-line
   function getPastTotalSupply(uint256 timepoint) public view override returns (uint256) {
-    return _nation.totalSupplyAt(timepoint);
+    return _passport.totalSupply();
   }
 
   /// @inheritdoc IVotesUpgradeable
