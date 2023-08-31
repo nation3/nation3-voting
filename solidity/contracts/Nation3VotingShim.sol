@@ -5,7 +5,6 @@ pragma solidity =0.8.17;
 import {Initializable} from '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
 import {ERC165Upgradeable} from '@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol';
 
-import {PluginUUPSUpgradeable} from '@aragon/osx/core/plugin/PluginUUPSUpgradeable.sol';
 import {IVotesUpgradeable} from '@openzeppelin/contracts-upgradeable/governance/utils/IVotesUpgradeable.sol';
 import {DaoAuthorizableUpgradeable} from '@aragon/osx/core/plugin/dao-authorizable/DaoAuthorizableUpgradeable.sol';
 import {IDAO} from '@aragon/osx/core/dao/IDAO.sol';
@@ -13,12 +12,13 @@ import {IDAO} from '@aragon/osx/core/dao/IDAO.sol';
 import {IPassportIssuer} from '../interfaces/IPassportIssuer.sol';
 import {IPassport} from '../interfaces/IPassport.sol';
 import {IVoteEscrow} from '../interfaces/IVoteEscrow.sol';
+import {UpgradableUUPSBase} from './UpgradableUUPSBase.sol';
 
 /// @title Nation3VotingShim
 /// @author Nation3: (@pythonpete32)
 /// @dev support for the IVotesUpgradeable is required to make this contract compatable with the Aragon [TokenVoting plugin](https://github.com/aragon/osx/blob/0ad8cad2bb661fbd53086d097d11228304d9b73e/packages/contracts/src/plugins/governance/majority-voting/token/TokenVotingSetup.sol#L107).
 /// @notice This is a wrapper contract that enables 1 person 1 vote for Nation3 passport holders.
-contract Nation3VotingShim is Initializable, ERC165Upgradeable, IVotesUpgradeable, PluginUUPSUpgradeable {
+contract Nation3VotingShim is Initializable, ERC165Upgradeable, IVotesUpgradeable, UpgradableUUPSBase {
   /// @dev Address of the PassportIssuer contract
   IPassportIssuer private constant _passportIssuer = IPassportIssuer(0x279c0b6bfCBBA977eaF4ad1B2FFe3C208aa068aC);
   /// @dev Address of the VoteEscrow contract
@@ -39,7 +39,7 @@ contract Nation3VotingShim is Initializable, ERC165Upgradeable, IVotesUpgradeabl
   /// @notice Initializes the contract and mints tokens to a list of receivers.
   /// @param _dao The managing DAO.
   function initialize(IDAO _dao) public initializer {
-    __PluginUUPSUpgradeable_init(_dao);
+    __UpgradableUUPSBase_init(_dao);
   }
 
   /// @notice Checks if this or the parent contract supports an interface by its ID.
@@ -49,7 +49,7 @@ contract Nation3VotingShim is Initializable, ERC165Upgradeable, IVotesUpgradeabl
     public
     view
     virtual
-    override(ERC165Upgradeable, PluginUUPSUpgradeable)
+    override(ERC165Upgradeable, UpgradableUUPSBase)
     returns (bool)
   {
     return _interfaceId == NATION3_SHIM_INTERFACE_ID || _interfaceId == type(IVotesUpgradeable).interfaceId
