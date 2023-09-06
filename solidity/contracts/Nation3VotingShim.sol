@@ -20,11 +20,11 @@ import {UpgradableUUPSBase} from './UpgradableUUPSBase.sol';
 /// @notice This is a wrapper contract that enables 1 person 1 vote for Nation3 passport holders.
 contract Nation3VotingShim is Initializable, ERC165Upgradeable, IVotesUpgradeable, UpgradableUUPSBase {
   /// @dev Address of the PassportIssuer contract
-  IPassportIssuer private constant _passportIssuer = IPassportIssuer(0x279c0b6bfCBBA977eaF4ad1B2FFe3C208aa068aC);
+  IPassportIssuer public constant passportIssuer = IPassportIssuer(0x279c0b6bfCBBA977eaF4ad1B2FFe3C208aa068aC);
   /// @dev Address of the VoteEscrow contract
-  IVoteEscrow private constant _nation = IVoteEscrow(0x333A4823466879eeF910A04D473505da62142069);
+  IVoteEscrow public constant veNation = IVoteEscrow(0xF7deF1D2FBDA6B74beE7452fdf7894Da9201065d);
 
-  IPassport private constant _passport = IPassport(0x3337dac9F251d4E403D6030E18e3cfB6a2cb1333);
+  IPassport public constant passport = IPassport(0x3337dac9F251d4E403D6030E18e3cfB6a2cb1333);
 
   /// @notice The [ERC-165](https://eips.ethereum.org/EIPS/eip-165) interface ID of the contract.
   bytes4 internal constant NATION3_SHIM_INTERFACE_ID = this.initialize.selector;
@@ -58,9 +58,9 @@ contract Nation3VotingShim is Initializable, ERC165Upgradeable, IVotesUpgradeabl
 
   /// @inheritdoc IVotesUpgradeable
   function getPastVotes(address account, uint256 timepoint) public view override returns (uint256) {
-    uint256 balance = _nation.balanceOfAt(account, timepoint);
-    if (balance < _passportIssuer.revokeUnderBalance()) return 0;
-    return _passportIssuer.passportStatus(account) == 1 ? 1 : 0;
+    uint256 balance = veNation.balanceOfAt(account, timepoint);
+    if (balance < passportIssuer.revokeUnderBalance()) return 0;
+    return passportIssuer.passportStatus(account) == 1 ? 1 : 0;
   }
 
   /// @inheritdoc IVotesUpgradeable
@@ -77,8 +77,16 @@ contract Nation3VotingShim is Initializable, ERC165Upgradeable, IVotesUpgradeabl
   /// @inheritdoc IVotesUpgradeable
   /// @dev The timepoint is not used since we dont have the checkpointing mechanism. This means minting and burning after a vote is created will affect the quorum.
   // solhint-disable-next-line
-  function getPastTotalSupply(uint256 timepoint) public view override returns (uint256) {
-    return _passport.totalSupply();
+  function getPastTotalSupply(uint256)
+    /**
+     * timepoint
+     */
+    public
+    view
+    override
+    returns (uint256)
+  {
+    return passport.totalSupply();
   }
 
   /// @inheritdoc IVotesUpgradeable

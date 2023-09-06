@@ -16,4 +16,11 @@ interface IVoteEscrow {
    * @return The total supply of the token at the specified block number.
    */
   function totalSupplyAt(uint256 blockNumber) external view returns (uint256);
+
+  /**
+   * @notice Deposit `_value` tokens for `msg.sender` and lock until `_unlock_time`
+   * @param _value Amount to deposit
+   * @param _unlock_time Epoch time when tokens unlock, rounded down to whole weeks
+   */
+  function create_lock(uint256 _value, uint256 _unlock_time) external;
 }

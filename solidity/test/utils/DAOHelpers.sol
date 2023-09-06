@@ -50,7 +50,7 @@ contract DAOHelpers is AddressRepository {
     address initialOwner,
     address trustedForwarder,
     string memory daoURI
-  ) external returns (DAO dao) {
+  ) public returns (DAO dao) {
     DAOFactory factory = DAOFactory(getAddress(network, 'DAOFactory'));
     dao = DAO(payable(createERC1967Proxy(factory.daoBase(), bytes(''))));
     dao.initialize({
@@ -86,7 +86,7 @@ contract DAOHelpers is AddressRepository {
     dao = factory.createDao({_daoSettings: settings, _pluginSettings: pluginSettingsArray});
   }
 
-  function deployMockDao(string memory network, address owner) external returns (DAO dao) {
+  function deployMockDao(string memory network, address owner) public returns (DAO dao) {
     return deployAdminDao({
       network: network,
       subdomain: 'testing69420',
